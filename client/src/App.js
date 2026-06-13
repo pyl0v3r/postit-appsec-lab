@@ -5,6 +5,7 @@ import { fetchPosts, createPost, updatePost, deletePost, createComment, deleteCo
 import Login from './Login';
 import Register from './Register';
 import DOMPurify from 'dompurify';
+import { toast, ToastContainer } from 'react-toastify';
 
 function App() {
   const [posts, setPosts] = useState([]);
@@ -43,7 +44,7 @@ function App() {
       <nav style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
         <div>
           <Link to="/">Home</Link>
-          {currentUser && currentUser.user && currentUser.user.username ? <p>Hello, {currentUser.user.username}</p> : ''}
+          {currentUser && currentUser.user && currentUser.user.username ? <p>Hello, <b>{currentUser.user.username}</b></p> : ''}
         </div>
         <div>
           {token ? (
@@ -75,13 +76,20 @@ function App() {
         />
 
       </Routes>
+      <ToastContainer />
     </div>
   );
 }
 
 function Home({ posts, newPost, setNewPost, loadPosts, token, currentUser }) {
   const handleCreatePost = async () => {
-    await createPost(newPost, token);
+    const postRes = await createPost(newPost, token);
+    if (!postRes.success) {
+      toast.error(postRes.message);
+      return;
+    } else {
+      toast.success(postRes.message);
+    }
     setNewPost({ title: '', content: '' });
     loadPosts();
   };
@@ -129,17 +137,48 @@ function PostCard({ post, refresh, token, currentUser }) {
     currentUser && post.author && post.author._id === currentUser.userId;
 
   const save = async () => {
-    await updatePost(post._id, { title, content }, token);
+    const res = await updatePost(post._id, { title, content }, token);
+    if (!res.success) {
+      toast.error(res.message);
+      return;
+    } else {
+      toast.success(res.message);
+    }
     setEdit(false);
     refresh();
   };
 
   const addComment = async () => {
-    await createComment(post._id, comment, token);
+    const res = await createComment(post._id, comment, token);
+    if (!res.success) {
+      toast.error(res.message);
+      return;
+    } else {
+      toast.success(res.message);
+    }
     setComment('');
     refresh();
   };
-
+  const removeComment = async (commentId) => {
+    const res = await deleteComment(commentId, token);
+    if (!res.success) {
+      toast.error(res.message);
+      return;
+    } else {
+      toast.success(res.message);
+    }
+    refresh();
+  };
+  const removePost = async (postId) => {
+    const res = await deletePost(postId, token);
+    if (!res.success) {
+      toast.error(res.message);
+      return;
+    } else {
+      toast.success(res.message);
+    }
+    refresh();
+  };
   return (
     <div className="card">
       {edit ? (
@@ -168,7 +207,7 @@ function PostCard({ post, refresh, token, currentUser }) {
 
           <button
             className="danger"
-            onClick={() => deletePost(post._id, token).then(refresh)}
+            onClick={() => removePost(post._id, token)}
           >
             Delete
           </button>
@@ -192,7 +231,7 @@ function PostCard({ post, refresh, token, currentUser }) {
               {token && isCommentOwner && (
                 <button
                   className="danger small"
-                  onClick={() => deleteComment(c._id, token).then(refresh)}
+                  onClick={() => removeComment(c._id)}
                 >
                   Delete
                 </button>

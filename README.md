@@ -51,16 +51,23 @@ It demonstrates:
 
 This project intentionally includes realistic security flaws commonly seen in production systems, then demonstrates how they are identified and fixed.
 
-### Key Security Areas Covered
+## Key Security Areas Covered
 
-- Secure authentication and authorization
-- Insecure Direct Object References (IDOR)
-- OWASP Top 10 vulnerabilities
+- JWT security validation
 - NoSQL injection (MongoDB-specific)
-- Stored Cross-Site Scripting (XSS)
-- Rate-limiting and abuse prevention
-- Secure logging and detection strategies
 - CI/CD security integration
+
+## Security Controls Implemented
+
+### Authentication & Abuse Prevention
+- Rate limiting on authentication endpoints (login/register)
+- Brute-force protection via request throttling
+- Secure logging and detection strategies
+
+### Input Validation & Injection Prevention
+- Server-side input validation on all user-controlled fields
+- MongoDB query sanitization to prevent NoSQL injection
+- Schema-level validation using Mongoose
 
 ---
 
@@ -98,6 +105,18 @@ Each vulnerability includes:
 
 ---
 
+## Security Findings Summary
+
+| Finding | OWASP Category | Severity | Status |
+|---|---|---|---|
+| IDOR in post access | A01 Broken Access Control | High | Fixed |
+| IDOR in comments | A01 Broken Access Control | High | Fixed |
+| Stored XSS | A05 Injection | High | Fixed |
+| NoSQL Injection | A05 Injection | High | Fixed |
+| JWT Weak Configuration | A07 Authentication | Medium | Fixed |
+| Brute Force Risk | A07 Authentication | Medium | Fixed |
+| Insufficient Logging | A09 Logging | Medium | Fixed |
+
 ## Security Testing Approach
 
 ### Manual Testing
@@ -121,8 +140,6 @@ For each identified issue, the project demonstrates:
 - Trade-offs between usability and security
 - Developer-friendly remediation guidance
 
-This reflects how AppSec engineers work collaboratively with development teams.
-
 ---
 
 ## Logging & Detection
@@ -135,8 +152,6 @@ For each major vulnerability, the project documents:
 - Sample detection logic (SIEM-style thinking)
 - Alerting considerations
 
-This bridges AppSec and Detection Engineering perspectives.
-
 ---
 
 ## Who This Project Is For
@@ -145,7 +160,7 @@ This project is intended to demonstrate readiness for roles such as:
 - Application Security Engineer
 - Product Security Engineer
 - Secure Software Engineer
-- DevSecOps Engineer (Junior–Mid)
+- DevSecOps Engineer
 
 It is especially relevant for teams building modern web applications and APIs.
 

@@ -59,22 +59,37 @@ The primary security goals of the application are:
 
 ---
 
-## 5. Architecture
+## 5. Architecture and Data Flow
 
-### High-Level Architecture
-
-Browser (React)
-|
-| HTTPS (JWT)
-|
-Node.js API (Express)
-|
-| Mongoose
-|
-MongoDB
-
+```text
++-------------+
+|  Attacker   |
++-------------+
+       |
+       v
++----------------+
+| React Frontend |
+| Untrusted Data |
++----------------+
+       |
+       | HTTPS / JWT
+       v
++----------------+
+|  Express API   |
+| AuthZ Checks   |
+| Validation     |
++----------------+
+       |
+       | Mongoose
+       v
++----------------+
+|   MongoDB      |
+|  User Data     |
++----------------+ 
+```
 
 ---
+
 
 ## 6. Trust Boundaries
 
@@ -150,7 +165,20 @@ Trust boundaries indicate where security checks are required:
 
 ---
 
-## 9. High-Risk Threats (Prioritized)
+## 9. Threat -> Control Mapping
+### Security Controls Mapping
+
+| Threat | Security Control |
+|---|---|
+| IDOR | Server-side ownership checks |
+| XSS | Output encoding + sanitization |
+| NoSQL Injection | Query validation |
+| Brute Force | Rate limiting + monitoring |
+| JWT Abuse | Secure token validation |
+| Abuse | Logging + detection |
+
+---
+## 10. High-Risk Threats (Prioritized)
 
 The following threats are considered **high risk** and are intentionally included in the application for security testing and remediation:
 
@@ -163,7 +191,7 @@ The following threats are considered **high risk** and are intentionally include
 
 ---
 
-## 10. Security Assumptions
+## 11. Security Assumptions
 
 - The application is served over HTTPS
 - MongoDB is not directly exposed to the internet
@@ -172,7 +200,7 @@ The following threats are considered **high risk** and are intentionally include
 
 ---
 
-## 11. Out of Scope
+## 12. Out of Scope
 
 - Image uploads
 - Admin panel
@@ -182,7 +210,7 @@ The following threats are considered **high risk** and are intentionally include
 
 ---
 
-## 12. Future Improvements
+## 13. Future Improvements
 
 - Role-based access control (RBAC)
 - Centralized logging and alerting
@@ -192,6 +220,6 @@ The following threats are considered **high risk** and are intentionally include
 
 ---
 
-## 13. Conclusion
+## 14. Conclusion
 
 This threat model highlights common and realistic attack scenarios affecting modern MERN-based applications. The identified threats align with real-world vulnerabilities observed in production environments and serve as the foundation for secure design, testing, and remediation activities.

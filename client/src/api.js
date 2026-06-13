@@ -14,7 +14,12 @@ export async function createPost(data, token) {
     },
     body: JSON.stringify(data)
   });
-  return res.json();
+const postRes = await res.json();
+  if (res.status === 201) {
+    return { success: true, message: postRes.message || 'Post added successfully' };
+  } else {
+    return { success: false, message: postRes.message };
+  }
 }
 
 export async function updatePost(postId, data, token) {
@@ -26,14 +31,25 @@ export async function updatePost(postId, data, token) {
     },
     body: JSON.stringify(data)
   });
-  return res.json();
+  const postRes = await res.json();
+  if (res.status === 200) {
+    return { success: true, message: postRes.message || 'Post updated successfully' };
+  } else {
+    return { success: false, message: postRes.message };
+  }
 }
 
 export async function deletePost(postId, token) {
-  await fetch(`${API_BASE}/posts/${postId}`, {
+  const res = await fetch(`${API_BASE}/posts/${postId}`, {
     method: 'DELETE',
     headers: { Authorization: `Bearer ${token}` }
   });
+  const postRes = await res.json();
+  if (res.status === 200) {
+    return { success: true, message: postRes.message || 'Post deleted successfully' };
+  } else {
+    return { success: false, message: postRes.message };
+  }
 }
 
 export async function createComment(postId, content, token) {
@@ -45,12 +61,23 @@ export async function createComment(postId, content, token) {
     },
     body: JSON.stringify({ content })
   });
-  return res.json();
+  const commentRes = await res.json();
+  if (res.status === 201) {
+    return { success: true, message: commentRes.message || 'Comment added successfully' };
+  } else {
+    return { success: false, message: commentRes.message };
+  }
 }
 
 export async function deleteComment(commentId, token) {
-  await fetch(`${API_BASE}/comments/${commentId}`, {
+  const res = await fetch(`${API_BASE}/comments/${commentId}`, {
     method: 'DELETE',
     headers: { Authorization: `Bearer ${token}` }
   });
+  const commentRes = await res.json();
+  if (res.status === 200) {
+    return { success: true, message: commentRes.message || 'Comment deleted successfully' };
+  } else {
+    return { success: false, message: commentRes.message };
+  }
 }

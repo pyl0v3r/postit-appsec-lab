@@ -4,7 +4,6 @@ export async function getUserFromToken(token) {
   try {
     const payload = JSON.parse(atob(token.split('.')[1]));
     payload.user = await fetchUser(payload.userId);
-    console.log('Decoded token payload:', payload);
     return payload; // contains userId, email, etc.
   } catch {
     return null;
