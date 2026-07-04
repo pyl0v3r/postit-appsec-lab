@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
 const helmet = require('helmet');
-AWS_ACCESS_KEY_ID = "AKIAIOSFODNN7EXAMPLE"
 // Routes
 const authRoutes = require('./routes/authRoutes');
 const postRoutes = require('./routes/postRoutes');
