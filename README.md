@@ -43,7 +43,7 @@ It demonstrates:
 - **Database:** MongoDB (Mongoose)
 - **Authentication:** JWT
 - **CI/CD:** GitHub Actions
-- **Security Tooling:** Burp Suite, Semgrep, OWASP ZAP
+- **Security Tooling:** Burp Suite, SonarCloud, OWASP ZAP
 
 ---
 
@@ -125,7 +125,7 @@ Each vulnerability includes:
 - HTTP-level analysis of authentication flows
 
 ### Automated Testing
-- SAST using Semgrep
+- SAST using SonarCloud
 - DAST using OWASP ZAP
 - CI/CD integration with GitHub Actions
 - False-positive triage and risk-based prioritization
