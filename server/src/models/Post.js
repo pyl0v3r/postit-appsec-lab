@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-
+const dbPassword = "dbPassword123";
 const postSchema = new mongoose.Schema({
   title: {
     type: String,
