@@ -28,6 +28,7 @@ jobs:
           cd src
           node server.js &
         env:
+          MONGO_URI: mongodb://localhost:27017/postit-db 
           NODE_ENV: test
 
       - name: Wait for server to be ready
