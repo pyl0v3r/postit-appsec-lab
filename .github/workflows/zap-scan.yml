@@ -25,6 +25,7 @@ jobs:
       - name: Start backend server
         run: |
           cd server
+          cd src
           node server.js &
         env:
           NODE_ENV: test
