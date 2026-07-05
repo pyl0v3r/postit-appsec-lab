@@ -1,0 +1,177 @@
+version: "1.0"
+metadata:
+  name: "postit-system-design"
+  description: "System design inventory and data flow mapping for the PostIt application"
+
+components:
+  - id: "C1"
+    name: "Frontend Web Application"
+    type: "React SPA Client"
+    environment: "User Browser"
+    data_handled: ["JWT tokens", "Form input", "Post and comment content"]
+    security_controls: ["Client-side routing", "DOM sanitization", "User feedback handling"]
+
+  - id: "C2"
+    name: "API Server"
+    type: "Node.js / Express Service"
+    environment: "Application Runtime"
+    data_handled: ["HTTP requests", "Authentication tokens", "User-generated content"]
+    security_controls: ["JWT verification", "Authorization middleware", "Input sanitization", "Rate limiting"]
+
+  - id: "C3"
+    name: "Authentication and Content Controllers"
+    type: "Application Logic Layer"
+    environment: "Server Process"
+    data_handled: ["User credentials", "Post records", "Comment records", "Ownership checks"]
+    security_controls: ["Password hashing", "Ownership enforcement", "Validation", "Structured logging"]
+
+  - id: "C4"
+    name: "MongoDB Database"
+    type: "Document Database"
+    environment: "Data Store"
+    data_handled: ["Users", "Posts", "Comments", "Security event metadata"]
+    security_controls: ["Mongoose schema validation", "Reference-based relationships", "Environment-based connection config"]
+
+  - id: "C5"
+    name: "Security Logging and Monitoring"
+    type: "Observability Service"
+    environment: "Server Process"
+    data_handled: ["Authentication events", "Suspicious activity", "Injection attempts"]
+    security_controls: ["Structured logging", "Failure tracking", "Brute-force monitoring"]
+
+trust_boundaries:
+  - id: "TB1"
+    name: "Client to Server Boundary"
+    separated_components: ["C1", "C2"]
+    threat_profile: "HTTP requests and tokens traverse a public network path."
+
+  - id: "TB2"
+    name: "Application to Data Boundary"
+    separated_components: ["C2", "C4"]
+    threat_profile: "User content and authentication data are processed and persisted here."
+
+  - id: "TB3"
+    name: "Internal Security Boundary"
+    separated_components: ["C2", "C3", "C5"]
+    threat_profile: "Application logic and monitoring services handle user-controlled input and security events."
+
+data_flows:
+  authentication:
+    - id: "DF_A1"
+      name: "User Registration and Login"
+      path: ["C1", "C2", "C3", "C4"]
+      protocol: "HTTPS / MongoDB"
+      description: "The client submits credentials, the server validates them, and the database stores user records."
+
+    - id: "DF_A2"
+      name: "JWT Session Handling"
+      path: ["C1", "C2", "C3"]
+      protocol: "HTTPS"
+      description: "The client sends a bearer token for authenticated requests, and the API validates it for protected actions."
+
+  content_management:
+    - id: "DF_B1"
+      name: "Create and Retrieve Posts"
+      path: ["C1", "C2", "C4"]
+      protocol: "HTTPS / MongoDB"
+      description: "Users create and read posts through the API, which stores and retrieves them from MongoDB."
+
+    - id: "DF_B2"
+      name: "Create and Manage Comments"
+      path: ["C1", "C2", "C4"]
+      protocol: "HTTPS / MongoDB"
+      description: "Comments are submitted through the API and linked to their parent post."
+
+  security_monitoring:
+    - id: "DF_C1"
+      name: "Security Event Logging"
+      path: ["C2", "C5"]
+      protocol: "Internal Logging"
+      description: "Authentication failures, injection attempts, and suspicious behavior are recorded for monitoring."
+
+assets:
+  - id: "AS1"
+    name: "User Credentials"
+    owner: "Authentication Service"
+    sensitivity: "High"
+    storage: ["C4"]
+
+  - id: "AS2"
+    name: "JWT Session Tokens"
+    owner: "API Server"
+    sensitivity: "High"
+    storage: ["C2", "C1"]
+
+  - id: "AS3"
+    name: "Post and Comment Content"
+    owner: "Content Management Service"
+    sensitivity: "Medium"
+    storage: ["C4"]
+
+  - id: "AS4"
+    name: "Security Logs"
+    owner: "Monitoring Service"
+    sensitivity: "Medium"
+    storage: ["C5"]
+
+threats:
+  - id: "TH1"
+    title: "Credential stuffing or brute-force login"
+    threat_type: "Spoofing / Tampering"
+    target: ["C2", "C4"]
+    description: "An attacker may attempt repeated login attempts to gain access to valid accounts."
+    likely_impact: "Account compromise and resource abuse"
+
+  - id: "TH2"
+    title: "Broken object authorization"
+    threat_type: "Tampering / Elevation of Privilege"
+    target: ["C2", "C3"]
+    description: "An attacker may manipulate requests to access or modify posts or comments belonging to other users."
+    likely_impact: "Unauthorized access to user content"
+
+  - id: "TH3"
+    title: "Stored XSS through user content"
+    threat_type: "Injection"
+    target: ["C1", "C2", "C4"]
+    description: "Malicious HTML or script content can be stored and later rendered to other users."
+    likely_impact: "Session theft or account takeover"
+
+  - id: "TH4"
+    title: "NoSQL injection through query parameters"
+    threat_type: "Injection"
+    target: ["C2", "C4"]
+    description: "User-controlled input may alter database query logic and expose or modify data."
+    likely_impact: "Unauthorized data access or manipulation"
+
+  - id: "TH5"
+    title: "Insufficient logging and monitoring"
+    threat_type: "Repudiation"
+    target: ["C5", "C2"]
+    description: "Security-relevant events may not be logged or correlated effectively."
+    likely_impact: "Delayed detection of abuse and difficult incident response"
+
+mitigations:
+  - id: "MT1"
+    threat_id: "TH1"
+    description: "Apply rate limiting and account lockout logic on login endpoints."
+    implemented_in: ["C2"]
+
+  - id: "MT2"
+    threat_id: "TH2"
+    description: "Enforce ownership checks and authorization middleware for all content updates and deletes."
+    implemented_in: ["C2", "C3"]
+
+  - id: "MT3"
+    threat_id: "TH3"
+    description: "Sanitize and validate user-generated content before storage and rendering."
+    implemented_in: ["C1", "C2"]
+
+  - id: "MT4"
+    threat_id: "TH4"
+    description: "Use parameterized queries and input validation to prevent injection."
+    implemented_in: ["C2", "C4"]
+
+  - id: "MT5"
+    threat_id: "TH5"
+    description: "Emit structured logs and alerts for authentication failures and suspicious behavior."
+    implemented_in: ["C2", "C5"]
