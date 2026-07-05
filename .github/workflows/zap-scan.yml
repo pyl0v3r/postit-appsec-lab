@@ -25,7 +25,7 @@ jobs:
       - name: Start backend server
         run: |
           cd server
-          npm start &
+          node server.js &
         env:
           NODE_ENV: test
 
@@ -36,7 +36,7 @@ jobs:
             echo "Waiting for server... attempt $i"
             sleep 2
           done
-          
+
       - name: Run ZAP Baseline Scan
         uses: zaproxy/action-baseline@v0.15.0
         with:
