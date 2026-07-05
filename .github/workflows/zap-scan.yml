@@ -1,0 +1,44 @@
+name: OWASP ZAP Baseline Scan
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  zap-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install backend dependencies
+        run: |
+          cd server
+          npm install
+
+      - name: Start backend server
+        run: |
+          cd server
+          npm start &
+        env:
+          NODE_ENV: test
+
+      - name: Wait for server to be ready
+        run: |
+          for i in $(seq 1 30); do
+            curl -s http://localhost:5000/ && break
+            echo "Waiting for server... attempt $i"
+            sleep 2
+          done
+          
+      - name: Run ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.15.0
+        with:
+          target: 'http://localhost:5000'
+          allow_issue_writing: true
